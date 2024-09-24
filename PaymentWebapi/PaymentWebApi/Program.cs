@@ -1,10 +1,12 @@
 using PaymentWebApi.Database;
 using PaymentWebApi.Database.ConnectionStringBuilder;
+using PaymentWebApi.Database.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IConnectionStringBuilderService, ConnectionStringBuilderService>();
 builder.Services.AddDatabase();
 builder.Services.AddControllers();
