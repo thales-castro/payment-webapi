@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${PAYMENT_ADMIN_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${PAYMENT_ADMIN_MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${PAYMENT_MONGO_ADMIN_DB}
+    volumes:
+      - ${PAYMENT_HOME}/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ${PAYMENT_MONGO_FOLDER_LINK_HOST_DATABASE}:/data/db
+    networks:
+      - payment-webapi-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: container-mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${PAYMENT_ADMIN_MONGO_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${PAYMENT_ADMIN_MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${PAYMENT_ADMIN_MONGO_USER}:${PAYMENT_ADMIN_MONGO_PASSWORD}@mongo:27017/${PAYMENT_MONGO_DATABASE}?authSource=${PAYMENT_ADMIN_MONGO_USER}
+    networks:
+      - payment-webapi-network
+    depends_on:
+     - mongo
+
+networks: 
+  payment-webapi-network:
+    driver: bridge
+
