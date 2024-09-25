@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PaymentWebApi.Database.Repositories;
 using PaymentWebApi.MercadoPago;
 using PaymentWebApi.PaymentEntities;
 using System.Text.Json;
@@ -12,12 +13,14 @@ namespace PaymentWebApi.Controllers
         private readonly ILogger<AfePaymentController> _logger;
         private readonly OrderService _orderService;
         private readonly MerchantOderService _merchantOderService;
-     
-        public AfePaymentController(ILogger<AfePaymentController> logger)
+        private readonly IOrderRepository _orderRepository;
+
+        public AfePaymentController(ILogger<AfePaymentController> logger, IOrderRepository orderRepository)
         {
             _logger = logger;
             _orderService = new();
             _merchantOderService = new();
+            _orderRepository = orderRepository;
         }
 
         [HttpGet]
@@ -25,17 +28,21 @@ namespace PaymentWebApi.Controllers
         {
             //Existe uma ordem corrent.
             //Verificar se a mesma foi paga, será que se paga some antes
-            bool ret_val = _orderService.OrderIsPaid("12345");
+            var item = new Item("title", 1, 1, "measure", 1);
+            var order = new Order("description", "reference", "url", "title", 1, [item]);
+            _orderRepository.Create(order);
+            return true;
+            //bool ret_val = _orderService.OrderIsPaid("12345");
 
-            Order? current_order =  await _orderService.GetCurrentOrderAsync(user_id, cashier_id);
+            //Order? current_order = await _orderService.GetCurrentOrderAsync(user_id, cashier_id);
 
-            if (current_order == null)
-            {
-                //Se a ordem existem no banco limpa e cria de novo.
-                bool was_created = await _orderService.CreateNewOrderAsync(user_id, store_external_id, cashier_id);
-            }
-                       
-            return ret_val;
+            //if (current_order == null)
+            //{
+            //    //Se a ordem existem no banco limpa e cria de novo.
+            //    bool was_created = await _orderService.CreateNewOrderAsync(user_id, store_external_id, cashier_id);
+            //}
+
+            //return ret_val;
 
         }
 
@@ -62,19 +69,20 @@ namespace PaymentWebApi.Controllers
                         }
                         else if (topic_message.topic == "payment" && merchant_order != null)
                         {
-                            OrderPaymentNotification? orderPaymentNotification = 
+                            OrderPaymentNotification? orderPaymentNotification =
                                 await _merchantOderService.GetOrderPaymentNotificationAsync(topic_message.resource);
                             if (orderPaymentNotification != null)
                             {
                                 _orderService.SetMerchantOrderPaid(orderPaymentNotification.external_reference);
-                            }                            
+                            }
                         }
                     }
                 }
-            } catch 
-            { 
             }
-            
+            catch
+            {
+            }
+
             /*
             else
             {
