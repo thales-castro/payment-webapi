@@ -27,6 +27,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.AddDefaultMongoData(builder.Services);
+
 app.UseAuthorization();
 
 app.MapControllers();

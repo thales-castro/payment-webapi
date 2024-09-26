@@ -28,22 +28,17 @@ namespace PaymentWebApi.Controllers
         {
             //Existe uma ordem corrent.
             //Verificar se a mesma foi paga, será que se paga some antes
-            var item = new Item("title", 1, 1, "measure", 1);
-            var order = new Order("description", "reference", "url", "title", 1, [item]);
-            _orderRepository.Create(order);
-            return true;
-            //bool ret_val = _orderService.OrderIsPaid("12345");
+            bool ret_val = _orderService.OrderIsPaid("12345");
 
-            //Order? current_order = await _orderService.GetCurrentOrderAsync(user_id, cashier_id);
+            Order? current_order = await _orderService.GetCurrentOrderAsync(user_id, cashier_id);
 
-            //if (current_order == null)
-            //{
-            //    //Se a ordem existem no banco limpa e cria de novo.
-            //    bool was_created = await _orderService.CreateNewOrderAsync(user_id, store_external_id, cashier_id);
-            //}
+            if (current_order == null)
+            {
+                //Se a ordem existem no banco limpa e cria de novo.
+                bool was_created = await _orderService.CreateNewOrderAsync(user_id, store_external_id, cashier_id);
+            }
 
-            //return ret_val;
-
+            return ret_val;
         }
 
         [HttpPost]
