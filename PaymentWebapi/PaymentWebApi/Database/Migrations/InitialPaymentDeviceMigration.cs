@@ -31,7 +31,8 @@ public class InitialPaymentDeviceMigration : IMigration
             StoreExternalId = "AfeTestStore01",
             CashierExternalId = "AfeTestCashier01"
         };
-        _paymentDevices.InsertOne(entity);
+        if(_paymentDevices.Find(pd => pd.MacAddress == entity.MacAddress).FirstOrDefault() == null)
+            _paymentDevices.InsertOne(entity);
     }
 
     public void Up(BsonDocument document)

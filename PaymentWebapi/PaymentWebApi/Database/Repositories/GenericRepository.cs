@@ -24,9 +24,16 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public T Create(T entity)
     {
         entity.CreatedAt = DateTime.Now; // MongoDB already set the date in UTC Format.
-        entity.CreatedBy = "Tracker"; // TODO: Get this from HttpContext.
+        entity.CreatedBy = "PaymentAPI"; // TODO: Get this from HttpContext.
         GetCollection().InsertOne(entity);
         return entity;
+    }
+
+    public Task CreateAsync(T entity)
+    {
+        entity.CreatedAt = DateTime.Now; // MongoDB already set the date in UTC Format.
+        entity.CreatedBy = "PaymentAPI"; // TODO: Get this from HttpContext.
+        return GetCollection().InsertOneAsync(entity);        
     }
 
     public T Read(string id) =>

@@ -1,4 +1,4 @@
-﻿namespace PaymentWebApi.PaymentEntities
+﻿namespace PaymentWebApi.Entities.MercadoPagoEntities
 {
     public class TopicMessage
     {

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PaymentWebApi.Database.Repositories;
+using PaymentWebApi.Dtos.MercadoPago;
+using PaymentWebApi.Entities;
+using PaymentWebApi.Entities.MercadoPagoEntities;
 using PaymentWebApi.MercadoPago;
-using PaymentWebApi.PaymentEntities;
+using PaymentWebApi.MercadoPagoServices;
 using System.Text.Json;
 
 namespace PaymentWebApi.Controllers
@@ -11,85 +15,130 @@ namespace PaymentWebApi.Controllers
     public class AfePaymentController : ControllerBase
     {
         private readonly ILogger<AfePaymentController> _logger;
-        private readonly OrderService _orderService;
-        private readonly MerchantOderService _merchantOderService;
+        private readonly IMerchantOrderService _merchantOrderService;
+        private readonly IOrderService _orderService;
         private readonly IOrderRepository _orderRepository;
+        private readonly IPaymentDeviceRepository _paymentDeviceRepository;
+        private readonly IMapper _mapper;
 
-        public AfePaymentController(ILogger<AfePaymentController> logger, IOrderRepository orderRepository)
+        public AfePaymentController(ILogger<AfePaymentController> logger, 
+            IMerchantOrderService merchantOrderService,
+            IOrderRepository orderRepository, 
+            IPaymentDeviceRepository paymentDeviceRepository, 
+            IOrderService orderService,
+            IMapper mapper)
         {
             _logger = logger;
-            _orderService = new();
-            _merchantOderService = new();
+            _merchantOrderService = merchantOrderService;
+            _orderService = orderService;
             _orderRepository = orderRepository;
+            _paymentDeviceRepository = paymentDeviceRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<bool> GetPaymentState(int user_id, string store_external_id, string cashier_id)
+        public async Task<bool> GetPaymentState(string payment_device_mac)
         {
-            //Existe uma ordem corrent.
-            //Verificar se a mesma foi paga, será que se paga some antes
-            bool ret_val = _orderService.OrderIsPaid("12345");
-
-            Order? current_order = await _orderService.GetCurrentOrderAsync(user_id, cashier_id);
-
-            if (current_order == null)
+            //TODO: Talvez uma resposta mais elaborada aqui.
+            PaymentDevice device = await _paymentDeviceRepository.GetDeviceByMacAddressAsync(payment_device_mac);
+            if (device == null || device.MacAddress == null || 
+                device.StoreExternalId == null || device.CashierExternalId == null) 
             {
-                //Se a ordem existem no banco limpa e cria de novo.
-                bool was_created = await _orderService.CreateNewOrderAsync(user_id, store_external_id, cashier_id);
+                return false;
             }
 
-            return ret_val;
+            //O Paymentdevice contém os campos necessários para os GET na api do mercado pago.
+            //Procurar no banco de dados a última order criada
+            Order currentOrder = await _orderRepository.GetLastOrder(device.MacAddress);
+           
+            if(currentOrder == null ||
+               currentOrder.status == OrderStatus.EXPIRED ||
+               currentOrder.status == OrderStatus.RETURNED)
+            {
+                //A última ordem já completou o seu ciclo ou não existe, então criar uma nova.
+                Order? defaultOrder = default(Order);
+                await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
+                OrderDto defaultOrderDto = _mapper.Map<OrderDto>(defaultOrder);
+                await _orderService.CreateNewOrderAsync(device.UserId, 
+                    device.StoreExternalId, 
+                    device.CashierExternalId, 
+                    defaultOrderDto);
+                return false;
+            }
+            else if (currentOrder.status == OrderStatus.PAID)
+            {
+                //Atualizar a ordem corrent, retornar que o valor foi pago
+                currentOrder.status = OrderStatus.RETURNED;
+                _orderRepository.Update(currentOrder);
+                //Esperar o próximo ciclo para criar uma nova order
+                return true;
+            }
+
+            //A ordem corrent está válida, pagamento não detectado
+            //Verificar na api do mercado pago se expirou, atualizar o estado e esperar próximo request.
+            Order? currentApiOrder = await _orderService.GetCurrentOrderAsync(device.UserId, device.CashierExternalId);
+            if (currentApiOrder == null)
+            {
+                currentOrder.status = OrderStatus.EXPIRED;
+                _orderRepository.Update(currentOrder);
+            }
+            
+            return false;
         }
 
         [HttpPost]
         public async Task<IActionResult> NotifyPayment([FromBody] JsonElement notify_data)
         {
+            _logger.LogInformation(notify_data.ToString());
             try
             {
-                JsonElement topic_value = default(JsonElement);
+               JsonElement topic_value = default(JsonElement);
                 if (notify_data.TryGetProperty("topic", out topic_value))
                 {
                     TopicMessage? topic_message =
                         JsonSerializer.Deserialize<TopicMessage>(notify_data);
                     if (topic_message != null)
                     {
-                        MerchantOrder? merchant_order =
-                             await _merchantOderService.GetOrder(topic_message.resource);
-
-                        if (topic_message.topic == "merchant_order" && merchant_order != null)
+                        if (topic_message.topic == "merchant_order")
                         {
                             _logger.LogInformation("An payment has started");
-                            if (merchant_order != null)
-                                _orderService.InserMerchantOrder(merchant_order);
-                        }
-                        else if (topic_message.topic == "payment" && merchant_order != null)
-                        {
-                            OrderPaymentNotification? orderPaymentNotification =
-                                await _merchantOderService.GetOrderPaymentNotificationAsync(topic_message.resource);
-                            if (orderPaymentNotification != null)
+                            //Iniciou o pagamento, consultar a api do mercado pago para trazer as informações.
+                            MerchantOrderDto? merchantOrderDto = await _merchantOrderService.GetMerchantOrderAsync(topic_message.resource);
+                            if (merchantOrderDto != null)
                             {
-                                _orderService.SetMerchantOrderPaid(orderPaymentNotification.external_reference);
+                                //TODO: Salvar no banco de dados.
+                                //Será que vai usar pra alguma coisa?
+                                _logger.LogInformation("Save to database");
+                            }
+                        }
+                        else if (topic_message.topic == "payment")
+                        {
+                            _logger.LogInformation("An payment has finished");
+                            //Chegou o pagamento
+                            MerchantOrderPaymentDto? merchantOrderPaymentDto = await _merchantOrderService.GetMerchantOrderPaymentAsync(topic_message.resource);
+                            if(merchantOrderPaymentDto != null)
+                            {
+                                //Atualizar o pagamento da order
+                                Order order = await _orderRepository.GetOrderByExternalReferenceAsync(merchantOrderPaymentDto.external_reference);
+                                if (order != null)
+                                {
+                                    order.status = OrderStatus.PAID;
+                                    _orderRepository.Update(order);
+                                }
+                                //TODO: O que fazer se não achar a ordem? Deve achar sempre.
+                                //TODO: Salvar no banco de dados
+                                _logger.LogInformation("Save to database");
                             }
                         }
                     }
                 }
             }
-            catch
+            catch (Exception ex) 
             {
+                _logger.LogInformation(ex.Message);
             }
-
-            /*
-            else
-            {
-                PaymentNotification? payment_notification =
-                    JsonSerializer.Deserialize<PaymentNotification>(notify_data);
-                if(payment_notification != null)
-                    _orderService.SetMerchantOrderPaid(payment_notification.id);
-                _logger.LogInformation(payment_notification?.ToString());
-            }
-            */
-
-            return Ok();
+            
+            return Ok();            
         }
     }
 }
