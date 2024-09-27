@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IConnectionStringBuilderService, ConnectionStringBuilderService>();
 builder.Services.AddScoped<IPaymentDeviceRepository, PaymentDeviceRepository>();
+builder.Services.AddScoped<IMerchantOrderRepository, MerchantOrderRepository>();
+builder.Services.AddScoped<IMerchantOrderPaymentRepository, MerchantOrderPaymentRepository>();
 //Services
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMerchantOrderService, MerchantOrderService>();
