@@ -109,34 +109,45 @@ public class AfePaymentController : ControllerBase
                     {
                         _logger.LogInformation("An payment has started");
                         //Iniciou o pagamento, consultar a api do mercado pago para trazer as informações.
+                        /*
                         MerchantOrderDto? merchantOrderDto = await _merchantOrderService.GetMerchantOrderAsync(topic_message.resource);
                         if (merchantOrderDto != null)
                         {
                             var entity = MerchantOrderMapper.GetEntityFromDto(merchantOrderDto);
                             _merchantOrderRepository.Create(entity);
                             //Será que vai usar pra alguma coisa?
-                            _logger.LogInformation("Save to database");
+                            _logger.LogInformation("Merchant order saved to database");
                         }
+                        */
                     }
                     else if (topic_message.topic == "payment")
                     {
-                        _logger.LogInformation("An payment has finished");
-                        //Chegou o pagamento
-                        MerchantOrderPaymentDto? merchantOrderPaymentDto = await _merchantOrderService.GetMerchantOrderPaymentAsync(topic_message.resource);
-                        if(merchantOrderPaymentDto != null)
+                        _logger.LogInformation("A payment has finished");                       
+                    }
+                }
+            }
+            else
+            {
+                PaymentNotificationDto? paymentNotificationDto =
+                    JsonSerializer.Deserialize<PaymentNotificationDto>(notify_data);
+                /**
+                 * Nessa classe vem o user_id e o id para consultar o pagamento
+                 * dentro do data, pode ser usado para vários clientes
+                 */
+                if (paymentNotificationDto != null)
+                {
+                    PaymentInfoDto? paymentInfoDto = await _merchantOrderService.GetMerchantOrderPaymentAsync(paymentNotificationDto.data.id);
+                    if (paymentInfoDto != null)
+                    {
+                        //Atualizar o pagamento da order
+                        Order order = await _orderRepository.GetOrderByExternalReferenceAsync(paymentInfoDto.external_reference);
+                        if (order != null)
                         {
-                            //Atualizar o pagamento da order
-                            Order order = await _orderRepository.GetOrderByExternalReferenceAsync(merchantOrderPaymentDto.external_reference);
-                            if (order != null)
-                            {
-                                order.status = OrderStatus.PAID;
-                                _orderRepository.Update(order);
-                            }
-                            //TODO: O que fazer se não achar a ordem? Deve achar sempre.
-                            var entity = MerchantOrderPaymentMapper.GetEntityFromDto(merchantOrderPaymentDto);
-                            _merchantOrderPaymentRepository.Create(entity);
-                            _logger.LogInformation("Save to database");
+                            order.status = OrderStatus.PAID;
+                            _orderRepository.Update(order);
                         }
+                        //TODO: Salvar nova entidade no banco
+                        _logger.LogInformation("Save to database");
                     }
                 }
             }
