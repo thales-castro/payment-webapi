@@ -29,7 +29,8 @@ public class InitialPaymentDeviceMigration : IMigration
             MacAddress = "10:52:1c:5d:49:e8",
             UserId = 1994736709,
             StoreExternalId = "AfeTestStore01",
-            CashierExternalId = "AfeTestCashier01"
+            CashierExternalId = "AfeTestCashier01",
+            Token = "APP_USR-6099630597304134-092008-9b1e83a93622d940a234083eeeee63bd-1994736709"
         };
         if(_paymentDevices.Find(pd => pd.MacAddress == entity.MacAddress).FirstOrDefault() == null)
             _paymentDevices.InsertOne(entity);

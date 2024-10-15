@@ -15,8 +15,9 @@ public class MerchantOrderService : MercadoPagoService, IMerchantOrderService
         return JsonSerializer.Deserialize<MerchantOrderDto>(jsonResponse);
     }
 
-    public async Task<PaymentInfoDto?> GetMerchantOrderPaymentAsync(string paymentId)
+    public async Task<PaymentInfoDto?> GetMerchantOrderPaymentAsync(string paymentId, string token)
     {
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         HttpResponseMessage response = await _httpClient.GetAsync(GET_PAYMENT_URL + paymentId);
         string jsonResponse = await response.Content.ReadAsStringAsync();
         if (jsonResponse != null)
