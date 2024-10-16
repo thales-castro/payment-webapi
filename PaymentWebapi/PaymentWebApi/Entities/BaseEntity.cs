@@ -9,7 +9,7 @@ public class BaseEntity
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
     [BsonElement("CreatedAt")]
-    public DateTime CreatedAt { get; set; } //TODO: Verify need to be protected
+    public DateTime CreatedAt { get; set; }
     [BsonElement("UpdatedAt")]
     public DateTime? UpdatedAt { get; set; }
     [BsonElement("RemovedAt")]
