@@ -13,5 +13,6 @@ public class PaymentDevice : BaseEntity, IVersioned
     public string? StoreExternalId { get; set; }
     [BsonElement("CashierExternalId")]
     public string? CashierExternalId { get; set; }
+    public string? Token { get; set; }
     public int Version { get; set; }
 }

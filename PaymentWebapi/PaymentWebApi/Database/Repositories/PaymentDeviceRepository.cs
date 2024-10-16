@@ -14,4 +14,9 @@ public class PaymentDeviceRepository : GenericRepository<PaymentDevice>, IPaymen
     {
         return GetCollection().Find(x => x.MacAddress == macAddress).FirstOrDefaultAsync();
     }
+
+    public Task<PaymentDevice> GetDeviceByUserId(long userId)
+    {
+        return GetCollection().Find(x => x.UserId == userId).FirstOrDefaultAsync();
+    }
 }

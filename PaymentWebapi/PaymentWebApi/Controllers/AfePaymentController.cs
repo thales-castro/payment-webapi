@@ -4,7 +4,6 @@ using PaymentWebApi.Database.Repositories;
 using PaymentWebApi.Dtos.MercadoPago;
 using PaymentWebApi.Entities;
 using PaymentWebApi.Entities.MercadoPagoEntities;
-using PaymentWebApi.Mappers;
 using PaymentWebApi.MercadoPagoServices;
 using System.Text.Json;
 
@@ -48,7 +47,8 @@ public class AfePaymentController : ControllerBase
         //TODO: Talvez uma resposta mais elaborada aqui.
         PaymentDevice device = await _paymentDeviceRepository.GetDeviceByMacAddressAsync(payment_device_mac);
         if (device == null || device.MacAddress == null || 
-            device.StoreExternalId == null || device.CashierExternalId == null) 
+            device.StoreExternalId == null || device.CashierExternalId == null ||
+            device.Token == null) 
         {
             return false;
         }
@@ -67,7 +67,8 @@ public class AfePaymentController : ControllerBase
             OrderDto defaultOrderDto = _mapper.Map<OrderDto>(defaultOrder);
             await _orderService.CreateNewOrderAsync(device.UserId, 
                 device.StoreExternalId, 
-                device.CashierExternalId, 
+                device.CashierExternalId,
+                device.Token,
                 defaultOrderDto);
             return false;
         }
@@ -82,7 +83,8 @@ public class AfePaymentController : ControllerBase
 
         //A ordem corrent está válida, pagamento não detectado
         //Verificar na api do mercado pago se expirou, atualizar o estado e esperar próximo request.
-        Order? currentApiOrder = await _orderService.GetCurrentOrderAsync(device.UserId, device.CashierExternalId);
+        Order? currentApiOrder = await _orderService.GetCurrentOrderAsync(
+            device.UserId, device.CashierExternalId, device.Token);
         if (currentApiOrder == null)
         {
             currentOrder.status = OrderStatus.EXPIRED;
@@ -108,35 +110,60 @@ public class AfePaymentController : ControllerBase
                     if (topic_message.topic == "merchant_order")
                     {
                         _logger.LogInformation("An payment has started");
+                        //TODO: Essa API foi descontinuada, verificar o que fazer
                         //Iniciou o pagamento, consultar a api do mercado pago para trazer as informações.
+                        /*
                         MerchantOrderDto? merchantOrderDto = await _merchantOrderService.GetMerchantOrderAsync(topic_message.resource);
                         if (merchantOrderDto != null)
                         {
                             var entity = MerchantOrderMapper.GetEntityFromDto(merchantOrderDto);
                             _merchantOrderRepository.Create(entity);
                             //Será que vai usar pra alguma coisa?
-                            _logger.LogInformation("Save to database");
+                            _logger.LogInformation("Merchant order saved to database");
                         }
+                        */
                     }
                     else if (topic_message.topic == "payment")
                     {
-                        _logger.LogInformation("An payment has finished");
-                        //Chegou o pagamento
-                        MerchantOrderPaymentDto? merchantOrderPaymentDto = await _merchantOrderService.GetMerchantOrderPaymentAsync(topic_message.resource);
-                        if(merchantOrderPaymentDto != null)
+                        _logger.LogInformation("A payment has finished");                       
+                    }
+                }
+            }
+            else
+            {
+                PaymentNotificationDto? paymentNotificationDto =
+                    JsonSerializer.Deserialize<PaymentNotificationDto>(notify_data);
+                /**
+                 * Nessa classe vem o user_id e o id para consultar o pagamento
+                 * dentro do data, pode ser usado para vários clientes
+                 */
+                if (paymentNotificationDto != null)
+                {
+                    //Recuperar o token de acordo com o usuário
+                    PaymentDevice paymentDevice = await
+                        _paymentDeviceRepository.GetDeviceByUserId(long.Parse(paymentNotificationDto.user_id));
+                    if (paymentDevice != null && paymentDevice.Token != null)
+                    {
+                        PaymentInfoDto? paymentInfoDto = await 
+                            _merchantOrderService.GetMerchantOrderPaymentAsync(paymentNotificationDto.data.id,
+                            paymentDevice.Token);
+                        if (paymentInfoDto != null)
                         {
+
                             //Atualizar o pagamento da order
-                            Order order = await _orderRepository.GetOrderByExternalReferenceAsync(merchantOrderPaymentDto.external_reference);
+                            Order order = await _orderRepository.GetOrderByExternalReferenceAsync(paymentInfoDto.external_reference);
                             if (order != null)
                             {
                                 order.status = OrderStatus.PAID;
                                 _orderRepository.Update(order);
                             }
-                            //TODO: O que fazer se não achar a ordem? Deve achar sempre.
-                            var entity = MerchantOrderPaymentMapper.GetEntityFromDto(merchantOrderPaymentDto);
-                            _merchantOrderPaymentRepository.Create(entity);
+                            //TODO: Salvar nova entidade no banco
                             _logger.LogInformation("Save to database");
                         }
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Could not get Payment device using user_id:{paymentNotificationDto.user_id}");
                     }
                 }
             }
