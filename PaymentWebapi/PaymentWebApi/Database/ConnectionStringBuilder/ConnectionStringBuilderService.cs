@@ -12,7 +12,7 @@ public class ConnectionStringBuilderService : IConnectionStringBuilderService
     public string GenerateMongConnection(out string databaseName)
     {
         databaseName = _configuration["DatabaseSettings:MongoDb:DatabaseName"] ?? "payment_webapi";
-        //mongodb://admin:payment@localhost:27017/tracker_system?authSource=admin - LOCAL DOCKER CONTAINER
+        //return "mongodb://admin:paymentwebapi2024@localhost:27017/payment_webapi?authSource=admin"; //- LOCAL DOCKER CONTAINER
         var serverPrefix = _configuration["DatabaseSettings:MongoDb:ServerPrefix"];
         string connStr = string.Format(
             "{0}://{1}:{2}@{3}/",
