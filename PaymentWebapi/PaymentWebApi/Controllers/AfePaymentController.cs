@@ -43,8 +43,8 @@ public class AfePaymentController : ControllerBase
 
     [HttpGet]
     public async Task<bool> GetPaymentState(string payment_device_mac)
-    {
-        //TODO: Talvez uma resposta mais elaborada aqui.
+    {        
+        //Usando o MAC encontrar os dados do dispositivo que está fazendo o request.
         PaymentDevice device = await _paymentDeviceRepository.GetDeviceByMacAddressAsync(payment_device_mac);
         if (device == null || device.MacAddress == null || 
             device.StoreExternalId == null || device.CashierExternalId == null ||
@@ -87,9 +87,25 @@ public class AfePaymentController : ControllerBase
             device.UserId, device.CashierExternalId, device.Token);
         if (currentApiOrder == null)
         {
-            currentOrder.status = OrderStatus.EXPIRED;
-            _orderRepository.Update(currentOrder);
-        }
+            /*Se a ordem corrent estiver nula pode ter acontecido duas situaçoes:
+             * 1 - A ordem expirou e não foi paga
+             * 2 - A ordem foi paga, mas o mercado pago ainda não informou o servidor sobre o pagamento.
+             * Necessário consultar o estado da ordem em API específica do mercado pago.
+            */
+            bool isPaid = await _orderService.CheckIfOrderPaidAsync(currentOrder.external_reference);
+            if (isPaid)
+            {
+                currentOrder.status = OrderStatus.RETURNED;
+                _orderRepository.Update(currentOrder);
+                //Esperar o próximo ciclo para criar uma nova order
+                return true;
+            }
+            else
+            {
+                currentOrder.status = OrderStatus.EXPIRED;
+                _orderRepository.Update(currentOrder);
+            }
+        }        
         
         return false;
     }
@@ -108,7 +124,7 @@ public class AfePaymentController : ControllerBase
                 if (topic_message != null)
                 {
                     if (topic_message.topic == "merchant_order")
-                    {
+                    {                        
                         _logger.LogInformation("An payment has started");
                         //TODO: Essa API foi descontinuada, verificar o que fazer
                         //Iniciou o pagamento, consultar a api do mercado pago para trazer as informações.
@@ -124,7 +140,7 @@ public class AfePaymentController : ControllerBase
                         */
                     }
                     else if (topic_message.topic == "payment")
-                    {
+                    {                        
                         _logger.LogInformation("A payment has finished");                       
                     }
                 }
