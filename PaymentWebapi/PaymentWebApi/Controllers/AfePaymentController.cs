@@ -4,6 +4,7 @@ using PaymentWebApi.Database.Repositories;
 using PaymentWebApi.Dtos.MercadoPago;
 using PaymentWebApi.Entities;
 using PaymentWebApi.Entities.MercadoPagoEntities;
+using PaymentWebApi.Mappers;
 using PaymentWebApi.MercadoPagoServices;
 using System.Text.Json;
 
@@ -19,8 +20,7 @@ public class AfePaymentController : ControllerBase
     private readonly IOrderRepository _orderRepository;
     private readonly IPaymentDeviceRepository _paymentDeviceRepository;
     private readonly IMapper _mapper;
-    private readonly IMerchantOrderRepository _merchantOrderRepository;
-    private readonly IMerchantOrderPaymentRepository _merchantOrderPaymentRepository;
+    private readonly IPaymentInfoRepository _paymentInfoRepository;
 
     public AfePaymentController(ILogger<AfePaymentController> logger,
         IMerchantOrderService merchantOrderService,
@@ -28,8 +28,7 @@ public class AfePaymentController : ControllerBase
         IPaymentDeviceRepository paymentDeviceRepository,
         IOrderService orderService,
         IMapper mapper,
-        IMerchantOrderRepository merchantOrderRepository,
-        IMerchantOrderPaymentRepository merchantOrderPaymentRepository)
+        IPaymentInfoRepository paymentInfoRepository)
     {
         _logger = logger;
         _merchantOrderService = merchantOrderService;
@@ -37,8 +36,7 @@ public class AfePaymentController : ControllerBase
         _orderRepository = orderRepository;
         _paymentDeviceRepository = paymentDeviceRepository;
         _mapper = mapper;
-        _merchantOrderRepository = merchantOrderRepository;
-        _merchantOrderPaymentRepository = merchantOrderPaymentRepository;
+        _paymentInfoRepository = paymentInfoRepository;
     }
 
     [HttpGet]
@@ -173,7 +171,9 @@ public class AfePaymentController : ControllerBase
                                 order.status = OrderStatus.PAID;
                                 _orderRepository.Update(order);
                             }
-                            //TODO: Salvar nova entidade no banco
+
+                            var paymentInfo = PaymentInfoMapper.GetEntityFromDto(paymentInfoDto);
+                            _paymentInfoRepository.Create(paymentInfo);
                             _logger.LogInformation("Save to database");
                         }
                     }
