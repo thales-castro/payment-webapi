@@ -23,6 +23,9 @@ public static class MongoInjection
             GetRequiredService<IMongoDatabase>();
 
         app.UseMongoMigration(m =>
-            m.ForEntity<PaymentDevice>(e => e.AtVersion(1).WithMigration(new InitialPaymentDeviceMigration(database))));
+            m.ForEntity<Company>(e => e.AtVersion(1).WithMigration(new InitialAdminUserMigration(database))));
+
+        app.UseMongoMigration(m =>
+            m.ForEntity<PaymentDevice>(e => e.AtVersion(2).WithMigration(new InitialPaymentDeviceMigration(database))));
     }
 }
