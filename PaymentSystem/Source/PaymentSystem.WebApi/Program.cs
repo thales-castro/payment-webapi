@@ -15,10 +15,13 @@ builder.Services.AddScoped<IConnectionStringBuilderService, ConnectionStringBuil
 builder.Services.AddScoped<IPaymentDeviceRepository, PaymentDeviceRepository>();
 builder.Services.AddScoped<IMerchantOrderRepository, MerchantOrderRepository>();
 builder.Services.AddScoped<IMerchantOrderPaymentRepository, MerchantOrderPaymentRepository>();
+builder.Services.AddScoped<IPaymentInfoRepository, PaymentInfoRepository>();
+
 //Services
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMerchantOrderService, MerchantOrderService>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDatabase();
 builder.Services.AddControllers();
 
@@ -30,17 +33,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(builder=> { builder.AddConsole(); });
 
-builder.WebHost.UseUrls("http://*:5228");
+//builder.WebHost.UseUrls("http://127.0.0.1:5228");
 
 var app = builder.Build();
 
-
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.AddDefaultMongoData(builder.Services);
 
