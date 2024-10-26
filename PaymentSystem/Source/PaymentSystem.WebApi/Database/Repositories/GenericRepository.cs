@@ -70,8 +70,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         if (entity == null)
         {
-            _logger.LogError($"Error on deleting entity {entity.GetType().Name} with id [{entity.Id}] does not exists.");
-            throw new EntityNotFoundException($"Error on deleting entity {entity.GetType().Name} with id [{entity.Id}] does not exists.");
+            Type entityType = typeof(T);
+            _logger.LogError($"Error on deleting entity {entityType.Name} with id [{id}] does not exists.");
+            throw new EntityNotFoundException($"Error on deleting entity {entityType.Name} with id [{id}] does not exists.");
         }
 
         entity.RemovedAt = DateTime.Now;
