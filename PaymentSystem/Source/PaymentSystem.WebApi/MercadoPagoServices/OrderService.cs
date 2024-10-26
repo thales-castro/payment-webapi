@@ -42,13 +42,17 @@ namespace PaymentSystem.WebApi.MercadoPago
             string sJsonContent = await response.Content.ReadAsStringAsync();
             if (sJsonContent != null)
             {
-                Dictionary<string, object>? jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(sJsonContent);
+                Dictionary<string, object>? jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(sJsonContent);                
                 if (jsonResponse == null || jsonResponse["results"] == null)
                     return false;
-                Dictionary<string, object>[]? kvResults = JsonSerializer.Deserialize<Dictionary<string, object>[]>(jsonResponse["results"].ToString());
-                if (kvResults == null)
-                    return false;
-                return kvResults.Length > 0;
+                string? sResults = jsonResponse["results"].ToString();
+                if (sResults != null)
+                {
+                    Dictionary<string, object>[]? kvResults = JsonSerializer.Deserialize<Dictionary<string, object>[]>(sResults);
+                    if (kvResults == null)
+                        return false;
+                    return kvResults.Length > 0;
+                }
             }
             return false;
         }
