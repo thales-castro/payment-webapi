@@ -27,6 +27,6 @@ COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "PaymentSystem.WebApi.dll"]
 
 # For Heroku Deployment, keep those lines uncommented.
-# RUN useradd -m trackersystemuser
-# USER trackersystemuser
+# RUN useradd -m paymentsystemuser
+# USER paymentsystemuser
 # CMD ASPNETCORE_URLS="http://*:$PORT" dotnet PaymentSystem.WebApi.dll

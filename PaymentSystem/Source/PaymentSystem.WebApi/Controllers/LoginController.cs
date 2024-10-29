@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PaymentSystem.WebApi.Dtos;
 using PaymentSystem.WebApi.Exceptions;
 using PaymentSystem.WebApi.Services.Auth;
 using System.Net;
@@ -24,15 +25,14 @@ public class LoginController : ControllerBase
     /// <summary>
     /// Login to system.
     /// </summary>
-    /// <param name="username"> Username to login. </param>
-    /// <param name="password"> Password to login. </param>
+    /// <param name="dto"> DTO with Username & Password </param>
     /// <returns> Http Response + JWT Bearer token (if success). </returns>
-    [HttpGet]
-    public async Task<ActionResult<string>> Login(string username, string password)
+    [HttpPost]
+    public async Task<ActionResult<string>> Login([FromBody] LoginDto dto)
     {
         try
         {
-            return Ok(await _service.Login(username, password));
+            return Ok(await _service.Login(dto.Username, dto.Password));
         }
         catch (EntityNotFoundException e)
         {

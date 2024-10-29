@@ -21,6 +21,19 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDatabase();
 builder.Services.AddControllers();
 
+var policyName = "_MyAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: policyName,
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 //Mappers
 builder.Services.AddAutoMapper(typeof(OrderProfile));
 
@@ -81,6 +94,8 @@ app.AddDefaultMongoData(builder.Services);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors(policyName);
 
 app.MapControllers();
 
