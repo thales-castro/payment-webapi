@@ -15,16 +15,16 @@ public class CompanyService : ICompanyService
     public CompanyDto Register(CompanyDto dto)
     {
         var entity = CompanyMapper.GetEntityFromDto(dto);
-        entity.Cnpj = entity.Cnpj.Replace(".", "");
-        entity.Cnpj = entity.Cnpj.Replace("/", "");
-        entity.Cnpj = entity.Cnpj.Replace("-", "");
+        entity.Cnpj = entity.Cnpj?.Replace(".", "");
+        entity.Cnpj = entity.Cnpj?.Replace("/", "");
+        entity.Cnpj = entity.Cnpj?.Replace("-", "");
         _repository.Create(entity);
         return CompanyMapper.GetDtoFromEntity(entity); ;
     }
 
-    public async Task<CompanyDto> GetByIdAsync(Guid id)
+    public async Task<CompanyDto> GetByIdAsync(string id)
     {
-        var entity = await _repository.GetByIdAsync(id.ToString()) ??
+        var entity = await _repository.GetByIdAsync(id) ??
             throw new EntityNotFoundException($"Company with id [{id}] not found.");
         return CompanyMapper.GetDtoFromEntity(entity); ;
     }
@@ -61,13 +61,16 @@ public class CompanyService : ICompanyService
             throw new Exception($"Could not find Company with id {dto.Id}");
         company.Cnpj = entity.Cnpj;
         company.Name = entity.Name;
+        company.MpUserId = entity.MpUserId;
+        company.MpStoreExternalReference = entity.MpStoreExternalReference;
+        company.Token = entity.Token;
         _repository.Update(company);
         return CompanyMapper.GetDtoFromEntity(company);
     }
 
-    public CompanyDto Delete(Guid id)
+    public CompanyDto Delete(string id)
     {
-        var entity = _repository.Delete(id.ToString());
+        var entity = _repository.Delete(id);
 
         var dto = CompanyMapper.GetDtoFromEntity(entity) ??
             throw new EntityNotFoundException($"Company with id [{id}] not found.");

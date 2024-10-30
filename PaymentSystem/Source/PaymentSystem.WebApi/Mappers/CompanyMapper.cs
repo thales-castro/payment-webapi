@@ -9,14 +9,21 @@ public static class CompanyMapper
         new()
         {
             Name = dto.Name,
-            Cnpj = dto.Cnpj
+            Cnpj = dto.Cnpj,
+            MpUserId = dto.MpUserId,
+            MpStoreExternalReference = dto.MpStoreExternalReference,
+            Token = dto.Token
         };
 
 
     public static CompanyDto GetDtoFromEntity(Company entity) =>
         new()
         {
-            Name = entity.Name,
-            Cnpj = entity.Cnpj
+            Id = entity.Id,
+            Name = entity.Name ?? string.Empty,
+            Cnpj = entity.Cnpj ?? string.Empty,
+            MpUserId = entity.MpUserId,
+            MpStoreExternalReference = entity.MpStoreExternalReference,
+            Token = entity.Token
         };
 }
