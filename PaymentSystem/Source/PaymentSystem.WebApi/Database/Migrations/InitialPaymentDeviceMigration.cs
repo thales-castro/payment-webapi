@@ -7,7 +7,7 @@ namespace PaymentSystem.WebApi.Database.Migrations;
 
 public class InitialPaymentDeviceMigration : IMigration
 {
-    public int Version => 1;
+    public int Version => 2;
 
     private readonly IMongoCollection<PaymentDevice> _paymentDevices;
 

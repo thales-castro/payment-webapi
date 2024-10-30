@@ -54,7 +54,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         entity.Id = oldEntity.Id;
         entity.UpdatedAt = DateTime.Now; // MongoDB already set the date in UTC Format.
-        entity.UpdatedBy = "Tracker";
+        entity.UpdatedBy = "Payment";
 
         var result = GetCollection().ReplaceOne(e => e.Id == oldEntity.Id, entity);
 
@@ -76,7 +76,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         }
 
         entity.RemovedAt = DateTime.Now;
-        entity.RemovedBy = "Tracker";
+        entity.RemovedBy = "Payment";
         entity.IsRemoved = true;
 
         var result = GetCollection().ReplaceOne(e => e.Id == entity.Id, entity);

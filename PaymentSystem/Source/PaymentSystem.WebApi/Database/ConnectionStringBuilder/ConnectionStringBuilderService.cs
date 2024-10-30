@@ -24,10 +24,7 @@ public class ConnectionStringBuilderService : IConnectionStringBuilderService
         if (serverPrefix == "mongodb+srv")
             connStr += "?retryWrites=true&w=majority";
         else if (serverPrefix == "mongodb")
-        {
             connStr += $"{databaseName}?authSource={_configuration["DatabaseSettings:MongoDb:Username"]}";
-            Console.WriteLine($"--------------------- connSTR IS: {connStr}");
-        }
 
         return connStr;
     }

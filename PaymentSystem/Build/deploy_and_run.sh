@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-echo "------------------- Going to load Tracker System docker images... -------------------"
+echo "------------------- Going to load Payment System docker images... -------------------"
 docker load -i payment-system-images.tar.gz
 
-echo "------------------- Going to put Tracker System up... -------------------"
+echo "------------------- Going to put Payment System up... -------------------"
 docker-compose up -d
