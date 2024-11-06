@@ -19,7 +19,7 @@ public class CompanyService : ICompanyService
         entity.Cnpj = entity.Cnpj?.Replace("/", "");
         entity.Cnpj = entity.Cnpj?.Replace("-", "");
         _repository.Create(entity);
-        return CompanyMapper.GetDtoFromEntity(entity); ;
+        return CompanyMapper.GetDtoFromEntity(entity);
     }
 
     public async Task<CompanyDto> GetByIdAsync(string id)
@@ -71,7 +71,6 @@ public class CompanyService : ICompanyService
     public CompanyDto Delete(string id)
     {
         var entity = _repository.Delete(id);
-
         var dto = CompanyMapper.GetDtoFromEntity(entity) ??
             throw new EntityNotFoundException($"Company with id [{id}] not found.");
         return dto;
