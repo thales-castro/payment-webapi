@@ -4,7 +4,8 @@ namespace PaymentSystem.WebApi.Database.Repositories;
 
 public interface ICompanyRepository : IGenericRepository<Company>
 {
-    Task<string> GetNameByIdAsync(string id);
+    Task<string?> GetNameByIdAsync(string id);
     Task<Company> GetByIdAsync(string id);
+    Task<Company> GetByMpUserIdAsync(string mpUserId);
     Task<List<Company>> GetNotDeletedAsync();
 }
