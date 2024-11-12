@@ -4,7 +4,7 @@ namespace PaymentSystem.WebApi.Services.Companies;
 
 public interface ICompanyService
 {
-    CompanyDto Register(CompanyDto dto);
+    Task<CompanyDto> Register(CompanyDto dto);
     List<CompanyDto> GetAll();
     Task<CompanyDto> GetByIdAsync(string id);
     Task<CompanyDto> UpdateAsync(CompanyDto dto);
