@@ -1,0 +1,27 @@
+﻿
+
+using System.Text.Json;
+
+namespace PaymentSystem.WebApi.MercadoPagoServices;
+
+public class StoreService : MercadoPagoService, IStoreService
+{
+    public StoreService(IConfiguration configuration) : base(configuration)
+    {
+    }
+
+    public async Task<bool> SetExternalIdAsync(string mpInternalUserId, int mpInternalStoreId, string token, string storeExternalIdToSet)
+    {
+        SetBearerToken(token);
+
+        var mpUrl = _configuration["MercadoPagoUrls:UpdateStore"] ??
+                throw new Exception("There is no Url to Update Store in appsettings.json");
+        var strAddress = string.Format(mpUrl, mpInternalUserId, mpInternalStoreId);
+        var body = new { external_id = storeExternalIdToSet };
+        var bodyStr = JsonSerializer.Serialize(body);
+        var strContent = new StringContent(bodyStr);
+        var response = await _httpClient.PutAsync(strAddress, strContent);
+
+        return (int)response.StatusCode == StatusCodes.Status200OK;
+    }
+}

@@ -89,7 +89,7 @@ public class AfePaymentController : ControllerBase
              * 2 - A ordem foi paga, mas o mercado pago ainda não informou o servidor sobre o pagamento.
              * Necessário consultar o estado da ordem em API específica do mercado pago.
             */
-            bool isPaid = await _orderService.CheckIfOrderPaidAsync(currentOrder.external_reference);
+            bool isPaid = await _orderService.CheckIfOrderIsPaidAsync(currentOrder.external_reference);
             if (isPaid)
             {
                 currentOrder.status = OrderStatus.RETURNED;

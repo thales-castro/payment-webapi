@@ -5,8 +5,13 @@ namespace PaymentSystem.WebApi.MercadoPagoServices;
 
 public class MerchantOrderService : MercadoPagoService, IMerchantOrderService
 {
-    //TODO: Salvar em configurações.
-    private readonly string GET_PAYMENT_URL = "https://api.mercadopago.com/v1/payments/";
+    private readonly string GET_PAYMENT_URL;
+
+    public MerchantOrderService(IConfiguration configuration) : base(configuration)
+    {
+        GET_PAYMENT_URL = configuration["MercadoPagoUrls:GetPayment"] ??
+                throw new Exception("There is no Url to Get Payment in appsettings.json");
+    }
 
     public async Task<MerchantOrderDto?> GetMerchantOrderAsync(string merchantOrderUrl)
     {

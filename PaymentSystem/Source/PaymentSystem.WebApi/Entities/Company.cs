@@ -14,6 +14,9 @@ public class Company : BaseEntity, IVersioned
     [BsonElement("MpUserId")]
     public string? MpUserId { get; set; }
 
+    [BsonElement("MpStoreInternalId")]
+    public int? MpStoreInternalId { get; set; }
+
     [BsonElement("MpStoreExternalReference")]
     public string? MpStoreExternalReference { get; set; }
 
