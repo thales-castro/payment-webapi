@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PaymentSystem.WebApi;
 using PaymentSystem.WebApi.Database;
-using PaymentSystem.WebApi.Mappers;
 using PaymentSystem.WebApi.Utils;
 using System.Text;
 

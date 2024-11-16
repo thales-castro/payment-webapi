@@ -11,6 +11,9 @@ public class PaymentDevice : BaseEntity, IVersioned
     public string? MacAddress { get; set; }
     [BsonElement("CashierExternalId")]
     public string? CashierExternalId { get; set; }
+
+    [BsonElement("CashierInternalMPId")]
+    public string? CashierInternalMPId { get; set; }
     public int Version { get; set; }
 }
 //[BsonElement("UserId")] // vai pra company

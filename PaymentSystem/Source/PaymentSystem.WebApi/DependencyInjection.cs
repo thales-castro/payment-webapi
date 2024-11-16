@@ -32,5 +32,6 @@ public static class DependencyInjection
         services.AddScoped<IMerchantOrderService, MerchantOrderService>();
         services.AddScoped<IPaymentDeviceService, PaymentDeviceService>();
         services.AddScoped<IStoreService, StoreService>();
+        services.AddScoped<ICashierService, CashierService>();
     }
 }

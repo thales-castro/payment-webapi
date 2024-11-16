@@ -12,7 +12,8 @@ public static class PaymentDeviceMapper
         {
             CompanyId = dto.CompanyId,
             CashierExternalId = dto.CashierExternalId,
-            MacAddress = dto.MacAddress
+            MacAddress = dto.MacAddress,
+            CashierInternalMPId = dto.CashierInternalMPId
         };
 
     public static PaymentDeviceDto GetDtoFromEntity(PaymentDevice entity) =>
@@ -38,6 +39,7 @@ public static class PaymentDeviceMapper
             CompanyId = company.Id ?? throw new Exception("CompanyId can't be empty."), 
             CompanyName = company.Name ?? "Não cadastrado",
             CashierExternalId = entity.CashierExternalId ?? string.Empty,
-            MacAddress = entity.MacAddress ?? string.Empty
+            MacAddress = entity.MacAddress ?? string.Empty,
+            CashierInternalMPId = entity.CashierInternalMPId ?? string.Empty
         };
 }

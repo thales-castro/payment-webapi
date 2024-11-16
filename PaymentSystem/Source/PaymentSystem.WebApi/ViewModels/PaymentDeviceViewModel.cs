@@ -7,4 +7,5 @@ public class PaymentDeviceViewModel
     public string CompanyName { get; set; } = null!;
     public string MacAddress { get; set; } = null!;
     public string CashierExternalId { get; set; } = null!;
+    public string CashierInternalMPId { get; set; } = null!;
 }

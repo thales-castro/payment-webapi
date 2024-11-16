@@ -5,7 +5,7 @@ namespace PaymentSystem.WebApi.Services.PaymentDevices;
 
 public interface IPaymentDeviceService
 {
-    PaymentDeviceDto Register(PaymentDeviceDto dto);
+    Task<PaymentDeviceDto> RegisterAsync(PaymentDeviceDto dto);
     List<PaymentDeviceDto> GetAll();
     Task<PaymentDeviceDto> GetByIdAsync(string id);
     Task<PaymentDeviceDto> UpdateAsync(PaymentDeviceDto dto);

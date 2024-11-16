@@ -2,6 +2,7 @@
 using PaymentSystem.WebApi.Dtos;
 using PaymentSystem.WebApi.Exceptions;
 using PaymentSystem.WebApi.Mappers;
+using PaymentSystem.WebApi.MercadoPagoServices;
 using PaymentSystem.WebApi.Services.Companies;
 using PaymentSystem.WebApi.ViewModels;
 
@@ -11,16 +12,29 @@ public class PaymentDeviceService : IPaymentDeviceService
 {
     private readonly IPaymentDeviceRepository _repository;
     private readonly ICompanyService _companyService;
+    private readonly ICashierService _cashierService;
 
-    public PaymentDeviceService(IPaymentDeviceRepository repository, ICompanyService companyService)
+    public PaymentDeviceService(IPaymentDeviceRepository repository, ICompanyService companyService, ICashierService cashierService)
     {
         _repository = repository;
         _companyService = companyService;
+        _cashierService = cashierService;
     }
 
-    public PaymentDeviceDto Register(PaymentDeviceDto dto)
+    public async Task<PaymentDeviceDto> RegisterAsync(PaymentDeviceDto dto)
     {
         var entity = PaymentDeviceMapper.GetEntityFromDto(dto);
+        if (entity != null &&
+           entity.CashierExternalId != null &&
+           entity.CashierInternalMPId != null)
+        {
+            //TODO: No futuro checar o retorno.
+            var company = await _companyService.GetByIdAsync(entity.CompanyId);
+            if (company != null && company.Token!=null)
+            {
+                await _cashierService.SetExternalIdAsync(entity.CashierInternalMPId, entity.CashierExternalId, company.Token);
+            }
+        }
         _repository.Create(entity);
         return PaymentDeviceMapper.GetDtoFromEntity(entity);
     }

@@ -36,12 +36,13 @@ public class PaymentDevicesController : ControllerBase
     /// <param name="dto"> PaymentDevice parameters to be registered. </param>
     /// <returns> Action result with created PaymentDevice, or error message. </returns>
     [HttpPost]
-    public ActionResult<PaymentDeviceDto> CreateAsync(PaymentDeviceDto dto)
+    public async Task<ActionResult<PaymentDeviceDto>> CreateAsync(PaymentDeviceDto dto)
     {
         try
         {
             CheckPermissions();
-            return StatusCode((int)HttpStatusCode.Created, _service.Register(dto));
+            var paymentDeviceDto = await _service.RegisterAsync(dto);
+            return StatusCode((int)HttpStatusCode.Created, paymentDeviceDto);
         }
         catch (ForbiddenResourceException e)
         {
