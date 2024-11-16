@@ -26,6 +26,7 @@ public class InitialPaymentDeviceMigration : IMigration
 
     public void Up()
     {
+        /*
         var company = new Company
         {
             Id = ObjectId.GenerateNewId().ToString(),
@@ -50,6 +51,7 @@ public class InitialPaymentDeviceMigration : IMigration
         };
         if (_paymentDevices.Find(pd => pd.MacAddress == paymentDevice.MacAddress).FirstOrDefault() == null)
             _paymentDevices.InsertOne(paymentDevice);
+        */
     }
 
     public void Up(BsonDocument document)

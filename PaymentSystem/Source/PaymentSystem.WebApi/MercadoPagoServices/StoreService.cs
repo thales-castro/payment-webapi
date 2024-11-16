@@ -1,5 +1,6 @@
 ﻿
 
+using System.Text;
 using System.Text.Json;
 
 namespace PaymentSystem.WebApi.MercadoPagoServices;
@@ -18,10 +19,9 @@ public class StoreService : MercadoPagoService, IStoreService
                 throw new Exception("There is no Url to Update Store in appsettings.json");
         var strAddress = string.Format(mpUrl, mpInternalUserId, mpInternalStoreId);
         var body = new { external_id = storeExternalIdToSet };
-        var bodyStr = JsonSerializer.Serialize(body);
-        var strContent = new StringContent(bodyStr);
-        var response = await _httpClient.PutAsync(strAddress, strContent);
-
+        string bodyStr = JsonSerializer.Serialize(body);
+        var strContent = new StringContent(bodyStr, Encoding.UTF8, "application/json");
+        var response = await _httpClient.PutAsync(strAddress, strContent);        
         return (int)response.StatusCode == StatusCodes.Status200OK;
     }
 }

@@ -13,6 +13,7 @@ public static class CompanyMapper
             Cnpj = dto.Cnpj,
             MpUserId = dto.MpUserId,
             MpStoreInternalId = dto.MpStoreInternalId,
+            MpStoreExternalReference = dto.MpStoreExternalReference,
             Token = dto.Token
         };
 

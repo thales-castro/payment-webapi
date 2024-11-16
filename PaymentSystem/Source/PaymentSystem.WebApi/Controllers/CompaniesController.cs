@@ -39,12 +39,13 @@ public class CompaniesController : ControllerBase
     /// <param name="dto"> Company parameters to be registered. </param>
     /// <returns> Action result with created Company, or error message. </returns>
     [HttpPost]
-    public ActionResult<CompanyDto> CreateAsync(CompanyDto dto)
+    public async Task<ActionResult<CompanyDto>> CreateAsync(CompanyDto dto)
     {
         try
         {
             CheckPermissions();
-            return StatusCode((int)HttpStatusCode.Created, _service.Register(dto));
+            CompanyDto newDto = await _service.Register(dto);
+            return StatusCode((int)HttpStatusCode.Created, newDto);
         }
         catch (ForbiddenResourceException e)
         {

@@ -32,7 +32,7 @@ public class CompanyService : ICompanyService
             if (await _storeService.SetExternalIdAsync(dto.MpUserId, (int)dto.MpStoreInternalId, dto.Token, dto.MpStoreExternalReference))
                 entity.MpStoreExternalReference = dto.MpStoreExternalReference;
         }
-
+     
         _repository.Create(entity);
         return CompanyMapper.GetDtoFromEntity(entity);
     }
