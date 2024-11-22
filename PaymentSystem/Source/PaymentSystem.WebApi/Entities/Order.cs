@@ -26,6 +26,21 @@ public class Order : BaseEntity
         this.status = OrderStatus.OPEN;
     }
 
+    public static string GetDescription(OrderStatus status)
+    {
+        switch(status)
+        {
+            case OrderStatus.OPEN:
+                return "Aberta";
+            case OrderStatus.PAID:
+            case OrderStatus.RETURNED:
+                return "Pago";
+            case OrderStatus.EXPIRED:
+                return "Expirada";
+        }
+        return string.Empty;
+    }
+
     public static Order LoadDefault(string mac_address)
     {
         //TODO: Com a interface administrativa controlar melhor o produto de acordo

@@ -4,6 +4,7 @@ using PaymentSystem.WebApi.MercadoPagoServices;
 using PaymentSystem.WebApi.Services.Auth;
 using PaymentSystem.WebApi.Services.Companies;
 using PaymentSystem.WebApi.Services.PaymentDevices;
+using PaymentSystem.WebApi.Services.Payments;
 using PaymentSystem.WebApi.Services.Users;
 
 namespace PaymentSystem.WebApi;
@@ -33,5 +34,6 @@ public static class DependencyInjection
         services.AddScoped<IPaymentDeviceService, PaymentDeviceService>();
         services.AddScoped<IStoreService, StoreService>();
         services.AddScoped<ICashierService, CashierService>();
+        services.AddScoped<IPaymentService, PaymentService>();
     }
 }
