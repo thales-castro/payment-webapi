@@ -25,13 +25,11 @@ public class AuthService : IAuthService
 
     public async Task<string> Login(string username, string password)
     {
-        var user = await _userService.GetByUsernameAsync(username);
-
-        if (user == null)
-            throw new EntityNotFoundException("Username not found.");
+        var user = await _userService.GetByUsernameAsync(username) ??
+            throw new EntityNotFoundException("Usuário/senha não encontrado.");
 
         if (!CriptographyExtension.CheckPasswordHash(password, user.PasswordHash!, user.PasswordSalt!))
-            throw new BadRequestException("Password is wrong.");
+            throw new BadRequestException("Usuário/senha não encontrado.");
         return await CreateJwtToken(user);
     }
 

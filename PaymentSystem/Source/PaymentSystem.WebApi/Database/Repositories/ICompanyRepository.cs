@@ -8,4 +8,6 @@ public interface ICompanyRepository : IGenericRepository<Company>
     Task<Company> GetByIdAsync(string id);
     Task<Company> GetByMpUserIdAsync(string mpUserId);
     Task<List<Company>> GetNotDeletedAsync();
+    Task<bool> ExistsWithSameCnpjAsync(string cnpj);
+    Task<bool> ExistsWithSameMpStoreInternalIdAsync(int pStoreInternalId);
 }
