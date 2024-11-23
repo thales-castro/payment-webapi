@@ -2,5 +2,5 @@
 
 public interface ICashierService
 {
-    Task SetExternalIdAsync(string mpInternalCashierId, string storeExternalCashierIdToSet, string token);
+    Task SetExternalIdAsync(string storeExternalCashierIdToSet, string cashierName, string mpInternalCashierId, string token);
 }

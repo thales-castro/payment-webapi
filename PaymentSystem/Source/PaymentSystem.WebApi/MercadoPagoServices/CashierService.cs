@@ -11,7 +11,7 @@ public class CashierService : MercadoPagoService, ICashierService
     {
     }
 
-    public async Task SetExternalIdAsync(string mpInternalCashierId, string storeExternalCashierIdToSet, string token)
+    public async Task SetExternalIdAsync(string storeExternalCashierIdToSet, string cashierName, string mpInternalCashierId, string token)
     {
         SetBearerToken(token);
 
@@ -19,7 +19,7 @@ public class CashierService : MercadoPagoService, ICashierService
                 throw new Exception("There is no Url to Update Cashier in appsettings.json");
 
         var strAddress = string.Format(mpUrl, mpInternalCashierId);
-        var body = new { external_id = storeExternalCashierIdToSet };
+        var body = new { name = cashierName, external_id = storeExternalCashierIdToSet };
         string bodyStr = JsonSerializer.Serialize(body);
         var strContent = new StringContent(bodyStr, Encoding.UTF8, "application/json");
         var response = await _httpClient.PutAsync(strAddress, strContent);

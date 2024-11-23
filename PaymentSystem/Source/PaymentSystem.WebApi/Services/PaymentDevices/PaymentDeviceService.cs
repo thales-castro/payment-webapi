@@ -36,7 +36,7 @@ public class PaymentDeviceService : IPaymentDeviceService
         if (company.Token == null)
             throw new Exception("O Token da Empresa em que o dispositivo será vinculado é nulo.");
 
-        await _cashierService.SetExternalIdAsync(entity.CashierInternalMPId!, entity.Id, company.Token);
+        await _cashierService.SetExternalIdAsync(entity.Id, entity.Name, entity.CashierInternalMPId!, company.Token);
 
         _repository.Create(entity);
         return PaymentDeviceMapper.GetDtoFromEntity(entity);
@@ -119,6 +119,12 @@ public class PaymentDeviceService : IPaymentDeviceService
         {
             nullOrEmptyDataNames ??= [];
             nullOrEmptyDataNames.Add(nameof(dto.Id));
+        }
+
+        if (string.IsNullOrEmpty(dto.Name))
+        {
+            nullOrEmptyDataNames ??= [];
+            nullOrEmptyDataNames.Add("Nome");
         }
 
         if (string.IsNullOrEmpty(dto.CompanyId))
