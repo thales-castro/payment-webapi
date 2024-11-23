@@ -2,6 +2,12 @@
 
 namespace PaymentSystem.WebApi.Dtos;
 
+public class PaymentDtoList
+{
+    public List<PaymentDto> Items { get; set; } = new List<PaymentDto>();
+    public double Total { get; set; }
+}
+
 public class PaymentDto
 {
     public string Id { get; set; }

@@ -4,5 +4,5 @@ namespace PaymentSystem.WebApi.Services.Payments;
 
 public interface IPaymentService
 {
-     Task<List<PaymentDto>> GetPayments();
+     Task<PaymentDtoList> GetPayments(PaymentFilterDto paymentFilter);
 }

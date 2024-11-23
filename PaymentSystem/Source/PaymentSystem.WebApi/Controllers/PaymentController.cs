@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PaymentSystem.WebApi.Dtos;
 using PaymentSystem.WebApi.Enums;
 using PaymentSystem.WebApi.Exceptions;
-using PaymentSystem.WebApi.Services.PaymentDevices;
 using PaymentSystem.WebApi.Services.Payments;
-using PaymentSystem.WebApi.ViewModels;
 using System.Net;
 
 namespace PaymentSystem.WebApi.Controllers;
@@ -32,12 +30,12 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<PaymentDto>>> GetPayments()
+    public async Task<ActionResult<PaymentDtoList>> GetPayments([FromQuery] PaymentFilterDto paymentFilter)
     {
         try
         {
             CheckPermissions();
-            var paymentDtoList = await _paymentService.GetPayments();
+            var paymentDtoList = await _paymentService.GetPayments(paymentFilter);
             return StatusCode((int)HttpStatusCode.Created, paymentDtoList);
         }
         catch (ForbiddenResourceException e)
