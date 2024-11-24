@@ -22,7 +22,7 @@ public class MerchantOrderService : MercadoPagoService, IMerchantOrderService
 
     public async Task<PaymentInfoDto?> GetMerchantOrderPaymentAsync(string paymentId, string token)
     {
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        SetBearerToken(token);
         HttpResponseMessage response = await _httpClient.GetAsync(GET_PAYMENT_URL + paymentId);
         string jsonResponse = await response.Content.ReadAsStringAsync();
         if (jsonResponse != null)

@@ -2,5 +2,5 @@
 
 public interface IStoreService
 {
-    Task<bool> SetExternalIdAsync(string mpInternalUserId, int mpInternalStoreId, string token, string storeExternalIdToSet);
+    Task SetExternalIdAsync(string mpInternalUserId, int mpInternalStoreId, string token, string storeExternalIdToSet);
 }

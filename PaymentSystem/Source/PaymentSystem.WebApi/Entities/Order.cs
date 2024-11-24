@@ -35,8 +35,8 @@ public class Order : BaseEntity
         Order default_order = new Order(
             mac_address,
             "AfePayment Default Order",
-            //"http://173.249.14.50:5228/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
-            "http://afepay.ddns.net:8089/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            "http://173.249.14.50:5228/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            // "http://afepay.ddns.net:8089/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
             "AfePayment Order",
             1,
             default_items
