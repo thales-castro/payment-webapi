@@ -26,6 +26,21 @@ public class Order : BaseEntity
         this.status = OrderStatus.OPEN;
     }
 
+    public static string GetDescription(OrderStatus status)
+    {
+        switch(status)
+        {
+            case OrderStatus.OPEN:
+                return "Aberta";
+            case OrderStatus.PAID:
+            case OrderStatus.RETURNED:
+                return "Pago";
+            case OrderStatus.EXPIRED:
+                return "Expirada";
+        }
+        return string.Empty;
+    }
+
     public static Order LoadDefault(string mac_address)
     {
         //TODO: Com a interface administrativa controlar melhor o produto de acordo
@@ -35,8 +50,8 @@ public class Order : BaseEntity
         Order default_order = new Order(
             mac_address,
             "AfePayment Default Order",
-            //"http://173.249.14.50:5228/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
-            "http://afepay.ddns.net:8089/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            "http://173.249.14.50:5228/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            // "http://afepay.ddns.net:8089/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
             "AfePayment Order",
             1,
             default_items

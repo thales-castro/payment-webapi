@@ -3,6 +3,7 @@ using PaymentSystem.WebApi.Dtos.Companies;
 using PaymentSystem.WebApi.Entities;
 using PaymentSystem.WebApi.ViewModels;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace PaymentSystem.WebApi.Mappers;
 
@@ -23,7 +24,6 @@ public static class PaymentDeviceMapper
         return new()
         {
             CompanyId = dto.CompanyId,
-            CashierExternalId = dto.CashierExternalId,
             MacAddress = dto.MacAddress,
             CashierInternalMPId = dto.CashierInternalMPId,
             SellItemDescr = dto.SellItemDescr,
@@ -42,8 +42,8 @@ public static class PaymentDeviceMapper
         return new()
         {
             Id = entity.Id,
+            Name = entity.Name,
             CompanyId = entity.CompanyId,
-            CashierExternalId = entity.CashierExternalId ?? string.Empty,
             MacAddress = entity.MacAddress ?? string.Empty,
             SellItemDescr = entity.SellItemDescr ?? string.Empty,
             SellItemValue = value
@@ -52,8 +52,8 @@ public static class PaymentDeviceMapper
 
     public static void UpdateEntityFromDto(this PaymentDevice entity, PaymentDeviceDto dto)
     {
+        entity.Name = dto.Name;
         entity.CompanyId = dto.CompanyId;
-        entity.CashierExternalId = dto.CashierExternalId;
         entity.MacAddress = dto.MacAddress;
         entity.SellItemValue = GetValueFromString(dto.SellItemValue);
         entity.SellItemDescr = dto.SellItemDescr;
@@ -71,9 +71,9 @@ public static class PaymentDeviceMapper
         return new()
         {
             Id = entity.Id,
-            CompanyId = company.Id ?? throw new Exception("CompanyId can't be empty."),
+            Name = entity.Name,
+            CompanyId = company.Id ?? throw new Exception("Company Id não pode ser nulo ou vazio."), 
             CompanyName = company.Name ?? "Não cadastrado",
-            CashierExternalId = entity.CashierExternalId ?? string.Empty,
             MacAddress = entity.MacAddress ?? string.Empty,
             CashierInternalMPId = entity.CashierInternalMPId ?? string.Empty,
             SellItemDescr = entity?.SellItemDescr ?? string.Empty,
