@@ -17,6 +17,13 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
         return CreateAsync(default_order);
     }
 
+    public Task CreateOrderAsync(string mac_address, string itemDescr, double itemValue, out Order newOrder)
+    {
+        Order order = Order.CreateNewOrder(mac_address, itemDescr, itemValue);
+        newOrder = order;
+        return CreateAsync(order);
+    }
+
     public Task<Order> GetLastOrder(string mac_address)
     {
         return GetCollection()

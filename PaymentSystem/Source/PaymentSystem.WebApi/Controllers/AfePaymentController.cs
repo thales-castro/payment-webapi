@@ -59,9 +59,15 @@ public class AfePaymentController : ControllerBase
            currentOrder.status == OrderStatus.RETURNED)
         {
             //A última ordem já completou o seu ciclo ou não existe, então criar uma nova.
-            Order? defaultOrder = default;
-            await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
-            var defaultOrderDto = OrderMapper.GetDtoFromEntity(defaultOrder);
+
+            //Order? defaultOrder = default;
+            //await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
+            Order? newOrder = default;
+            await _orderRepository.CreateOrderAsync(device.MacAddress, 
+                device.SellItemDescr != null?device.SellItemDescr: string.Empty, 
+                device.SellItemValue, 
+                out newOrder);            
+            var defaultOrderDto = OrderMapper.GetDtoFromEntity(newOrder);
             await _orderService.CreateNewOrderAsync(long.Parse(company.MpUserId ?? "0"),
                 company.MpStoreExternalReference,
                 device.CashierExternalId,

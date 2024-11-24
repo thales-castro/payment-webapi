@@ -14,6 +14,10 @@ public class PaymentDevice : BaseEntity, IVersioned
 
     [BsonElement("CashierInternalMPId")]
     public string? CashierInternalMPId { get; set; }
+    [BsonElement("SellItemDescr")]
+    public string? SellItemDescr { get; set; }
+    [BsonElement("SellItemValue")]
+    public double SellItemValue { get; set; }
     public int Version { get; set; }
 }
 //[BsonElement("UserId")] // vai pra company

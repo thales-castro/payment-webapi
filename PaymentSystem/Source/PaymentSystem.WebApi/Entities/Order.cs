@@ -13,7 +13,7 @@ public enum OrderStatus
 
 public class Order : BaseEntity
 {
-    public Order(string mac_address, string description, string notification_url, string title, int total_amount, Item[] items)
+    public Order(string mac_address, string description, string notification_url, string title, double total_amount, Item[] items)
     {
         this.Id = ObjectId.GenerateNewId().ToString();
         this.external_reference = this.Id;
@@ -44,11 +44,27 @@ public class Order : BaseEntity
         return default_order;
     }
 
+    public static Order CreateNewOrder(string mac_address, string itemDescription, double value)
+    {
+        Item item = new Item(itemDescription, value, 1, "Real", value);
+        Item[] items = [item];
+        Order newOrder = new Order(
+            mac_address,
+            "AfePayment Order",
+            //"http://173.249.14.50:5228/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            "http://afepay.ddns.net:8089/AfePayment", // TODO: Vai ser o IP do server e a porta (HARDCODED, no futuro envvar)
+            "AfePayment Order",
+            value,
+            items
+            );
+        return newOrder;
+    }
+
     public string description { get; set; }
     public string external_reference { get; set; }
     public string notification_url { get; set; }
     public string title { get; set; }
-    public int total_amount { get; set; }
+    public double total_amount { get; set; }
     public Item[] items { get; set; }
     public string mac_address { get; set; }
     public OrderStatus status { get; set; }
