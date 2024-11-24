@@ -43,11 +43,11 @@ public class AfePaymentController : ControllerBase
     {
         //Usando o MAC encontrar os dados do dispositivo que está fazendo o request.
         var device = await _paymentDeviceRepository.GetDeviceByMacAddressAsync(payment_device_mac);
-        if (device == null || device.MacAddress == null || device.CashierExternalId == null)
+        if (device == null || device.MacAddress == null || device.Id == null)
             return false;
 
         var company = await _companyRepository.GetByIdAsync(device.CompanyId);
-        if (company == null || company.MpStoreExternalReference == null || company.Token == null)
+        if (company == null || company.Id == null || company.Token == null)
             return false;
 
         //O Paymentdevice contém os campos necessários para os GET na api do mercado pago.
@@ -63,8 +63,8 @@ public class AfePaymentController : ControllerBase
             await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
             var defaultOrderDto = OrderMapper.GetDtoFromEntity(defaultOrder);
             await _orderService.CreateNewOrderAsync(long.Parse(company.MpUserId ?? "0"),
-                company.MpStoreExternalReference,
-                device.CashierExternalId,
+                company.Id,
+                device.Id,
                 company.Token,
                 defaultOrderDto);
             return false;
@@ -81,7 +81,7 @@ public class AfePaymentController : ControllerBase
         //A ordem corrent está válida, pagamento não detectado
         //Verificar na api do mercado pago se expirou, atualizar o estado e esperar próximo request.
         Order? currentApiOrder = await _orderService.GetCurrentOrderAsync(
-            long.Parse(company.MpUserId ?? "0"), device.CashierExternalId, company.Token);
+            long.Parse(company.MpUserId ?? "0"), device.Id, company.Token);
         if (currentApiOrder == null)
         {
             /*Se a ordem corrent estiver nula pode ter acontecido duas situaçoes:

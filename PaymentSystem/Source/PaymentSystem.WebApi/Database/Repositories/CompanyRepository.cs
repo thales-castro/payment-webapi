@@ -19,5 +19,11 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
 
     public async Task<Company> GetByMpUserIdAsync(string mpUserId) =>
         await GetCollection().Find(doc => doc.MpUserId == mpUserId).FirstOrDefaultAsync();
+
+    public async Task<bool> ExistsWithSameCnpjAsync(string cnpj) =>
+        await GetCollection().CountDocumentsAsync(doc => doc.Cnpj == cnpj) > 0;
+
+    public async Task<bool> ExistsWithSameMpStoreInternalIdAsync(int pStoreInternalId) =>
+        await GetCollection().CountDocumentsAsync(doc => doc.MpStoreInternalId == pStoreInternalId) > 0;
 }
 

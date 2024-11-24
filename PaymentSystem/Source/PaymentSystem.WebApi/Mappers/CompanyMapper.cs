@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using PaymentSystem.WebApi.Dtos.Companies;
+﻿using PaymentSystem.WebApi.Dtos.Companies;
 using PaymentSystem.WebApi.Entities;
 
 namespace PaymentSystem.WebApi.Mappers;
@@ -11,12 +10,10 @@ public static class CompanyMapper
         {
             Name = dto.Name,
             Cnpj = dto.Cnpj,
-            MpUserId = dto.MpUserId,
-            MpStoreInternalId = dto.MpStoreInternalId,
-            MpStoreExternalReference = dto.MpStoreExternalReference,
+            MpUserId = dto.MpUserId ?? string.Empty,
+            MpStoreInternalId = dto.MpStoreInternalId ?? 0,
             Token = dto.Token
         };
-
 
     public static CompanyDto GetDtoFromEntity(Company entity) =>
         new()
@@ -26,7 +23,6 @@ public static class CompanyMapper
             Cnpj = entity.Cnpj ?? string.Empty,
             MpUserId = entity.MpUserId,
             MpStoreInternalId = entity.MpStoreInternalId,
-            MpStoreExternalReference = entity.MpStoreExternalReference,
             Token = entity.Token
         };
 

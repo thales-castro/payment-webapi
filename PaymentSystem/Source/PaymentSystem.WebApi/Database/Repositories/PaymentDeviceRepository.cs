@@ -16,4 +16,10 @@ public class PaymentDeviceRepository : GenericRepository<PaymentDevice>, IPaymen
 
     public async Task<List<PaymentDevice>> GetNotDeletedAsync() =>
         await GetCollection().Find(doc => !doc.IsRemoved).ToListAsync();
+
+    public async Task<bool> CheckIfMacExistsAsync(string macAddress) =>
+        await GetCollection().CountDocumentsAsync(doc => doc.MacAddress == macAddress) > 0;
+
+    public async Task<bool> CheckIfCashierInternalMPIdExistsAsync(string cashierInternalMPId) =>
+        await GetCollection().CountDocumentsAsync(doc => doc.CashierInternalMPId == cashierInternalMPId) > 0;
 }
