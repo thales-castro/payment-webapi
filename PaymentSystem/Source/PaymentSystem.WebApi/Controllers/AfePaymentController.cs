@@ -103,9 +103,18 @@ public class AfePaymentController : ControllerBase
                 //Esperar o próximo ciclo para criar uma nova order
                 return true;
             }
+            else if (currentOrder.status == OrderStatus.WAITING_PAID && currentOrder.UpdatedAt != null)
+            {
+                if((DateTime.Now - currentOrder.UpdatedAt).Value.TotalSeconds > 5)
+                {
+                    currentOrder.status = OrderStatus.EXPIRED;
+                    _orderRepository.Update(currentOrder);
+                }
+            }
             else
             {
-                currentOrder.status = OrderStatus.EXPIRED;
+                //currentOrder.status = OrderStatus.EXPIRED;
+                currentOrder.status = OrderStatus.WAITING_PAID;
                 _orderRepository.Update(currentOrder);
             }
         }

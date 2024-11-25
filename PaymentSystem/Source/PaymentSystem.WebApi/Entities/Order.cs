@@ -8,7 +8,8 @@ public enum OrderStatus
     OPEN,
     PAID,
     EXPIRED,
-    RETURNED
+    RETURNED,
+    WAITING_PAID
 }
 
 public class Order : BaseEntity
@@ -33,10 +34,13 @@ public class Order : BaseEntity
             case OrderStatus.OPEN:
                 return "Aberta";
             case OrderStatus.PAID:
-            case OrderStatus.RETURNED:
                 return "Pago";
+            case OrderStatus.RETURNED:
+                return "Retornou Pago Placa";
             case OrderStatus.EXPIRED:
                 return "Expirada";
+            case OrderStatus.WAITING_PAID:
+                return "Aguardando Pagamento";
         }
         return string.Empty;
     }
