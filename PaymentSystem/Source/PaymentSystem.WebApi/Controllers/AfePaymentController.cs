@@ -52,7 +52,7 @@ public class AfePaymentController : ControllerBase
 
         //O Paymentdevice contém os campos necessários para os GET na api do mercado pago.
         //Procurar no banco de dados a última order criada
-        Order currentOrder = await _orderRepository.GetLastOrder(device.MacAddress);
+        Order currentOrder = await _orderRepository.GetLastOrderAsync(device.MacAddress);
 
         if (currentOrder == null ||
            currentOrder.status == OrderStatus.EXPIRED ||
