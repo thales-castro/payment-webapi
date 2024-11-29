@@ -52,16 +52,22 @@ public class AfePaymentController : ControllerBase
 
         //O Paymentdevice contém os campos necessários para os GET na api do mercado pago.
         //Procurar no banco de dados a última order criada
-        Order currentOrder = await _orderRepository.GetLastOrder(device.MacAddress);
+        Order currentOrder = await _orderRepository.GetLastOrderAsync(device.MacAddress);
 
         if (currentOrder == null ||
            currentOrder.status == OrderStatus.EXPIRED ||
            currentOrder.status == OrderStatus.RETURNED)
         {
             //A última ordem já completou o seu ciclo ou não existe, então criar uma nova.
-            Order? defaultOrder = default;
-            await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
-            var defaultOrderDto = OrderMapper.GetDtoFromEntity(defaultOrder);
+
+            //Order? defaultOrder = default;
+            //await _orderRepository.CreateNewDefaultOrderAsync(device.MacAddress, out defaultOrder);
+            Order? newOrder = default;
+            await _orderRepository.CreateOrderAsync(device.MacAddress, 
+                device.SellItemDescr != null?device.SellItemDescr: string.Empty, 
+                device.SellItemValue, 
+                out newOrder);            
+            var defaultOrderDto = OrderMapper.GetDtoFromEntity(newOrder);
             await _orderService.CreateNewOrderAsync(long.Parse(company.MpUserId ?? "0"),
                 company.Id,
                 device.Id,
@@ -97,9 +103,18 @@ public class AfePaymentController : ControllerBase
                 //Esperar o próximo ciclo para criar uma nova order
                 return true;
             }
+            else if (currentOrder.status == OrderStatus.WAITING_PAID && currentOrder.UpdatedAt != null)
+            {
+                if((DateTime.Now - currentOrder.UpdatedAt).Value.TotalSeconds > 5)
+                {
+                    currentOrder.status = OrderStatus.EXPIRED;
+                    _orderRepository.Update(currentOrder);
+                }
+            }
             else
             {
-                currentOrder.status = OrderStatus.EXPIRED;
+                //currentOrder.status = OrderStatus.EXPIRED;
+                currentOrder.status = OrderStatus.WAITING_PAID;
                 _orderRepository.Update(currentOrder);
             }
         }

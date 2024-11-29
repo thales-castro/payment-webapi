@@ -5,7 +5,7 @@ namespace PaymentSystem.WebApi.Dtos.MercadoPago
 {
     public class OrderDto
     {
-        public OrderDto(string description, string external_reference, string notification_url, string title, int total_amount, Item[] items)
+        public OrderDto(string description, string external_reference, string notification_url, string title, double total_amount, Item[] items)
         {
             this.description = description;
             this.external_reference = external_reference;
@@ -19,7 +19,7 @@ namespace PaymentSystem.WebApi.Dtos.MercadoPago
         public string external_reference { get; set; }
         public string notification_url { get; set; }
         public string title { get; set; }
-        public int total_amount { get; set; }
+        public double total_amount { get; set; }
         public Item[] items { get; set; }
 
         public string ToJson()

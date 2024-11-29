@@ -4,7 +4,10 @@ namespace PaymentSystem.WebApi.Dtos;
 
 public class PaymentDtoList
 {
-    public List<PaymentDto> Items { get; set; } = new List<PaymentDto>();
+    public List<PaymentDto> Items { get; set; } = [];
+    public int TotalItems { get; set; }
+    public int TotalPages { get; set; }
+    public int CurrentPage { get; set; }
     public double Total { get; set; }
 }
 

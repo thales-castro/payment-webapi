@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace PaymentSystem.WebApi.Dtos;
+﻿namespace PaymentSystem.WebApi.Dtos;
 
 public class PaymentDeviceDto
 {
@@ -9,4 +7,7 @@ public class PaymentDeviceDto
     public string CompanyId { get; set; } = null!;
     public string MacAddress { get; set; } = null!;
     public string CashierInternalMPId { get; set; } = null!;
+    public string SellItemDescr { get; set; } = null!;  
+    public string SellItemValue { get; set; } = null!;
+
 }

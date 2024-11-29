@@ -6,8 +6,14 @@ public interface IOrderRepository : IGenericRepository<Order>
 {
     Task CreateNewDefaultOrderAsync(string mac_address, out Order order);
 
-    Task<Order> GetLastOrder(string mac_address);
+    Task CreateOrderAsync(string mac_address, string itemDescr, double itemValue, out Order newOrder);
+
+    Task<Order> GetLastOrderAsync(string mac_address);
 
     Task<Order> GetOrderByExternalReferenceAsync(string externalReference);
+
+    Task<List<Order>> GetNotRemovedFilteredByDateAsync(DateTime startDate, DateTime endDate, int pageNumber, int pageSize);
+
+    Task<int> CountNotRemovedFilteredByDateAsync(DateTime startDate, DateTime endDate);
 }
 

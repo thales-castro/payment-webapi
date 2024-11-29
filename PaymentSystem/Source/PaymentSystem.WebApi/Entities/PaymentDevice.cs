@@ -14,5 +14,9 @@ public class PaymentDevice : BaseEntity, IVersioned
     public string MacAddress { get; set; } = null!;
     [BsonElement("CashierInternalMPId")]
     public string CashierInternalMPId { get; set; } = null!;
+    [BsonElement("SellItemDescr")]
+    public string? SellItemDescr { get; set; }
+    [BsonElement("SellItemValue")]
+    public double SellItemValue { get; set; }
     public int Version { get; set; }
 }
