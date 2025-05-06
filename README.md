@@ -1,2 +1,2 @@
 # payment-webapi
-Webapi to managem MercadoPago payments.
+Webapi to manage MercadoPago payments.
